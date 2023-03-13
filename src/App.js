@@ -1,25 +1,58 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
+
+
 function App() {
+  const [clickedItems, setClickedItems] = useState([]);
+  const [completed, setCompleted] = useState(false);
+
+  // Check if all items have been clicked and set completed state
+  useEffect(() => {
+    if (clickedItems.length === 9) {
+      setCompleted(true);  
+    }
+    let intervalId;
+    if (completed) {
+      let i = 0;
+      intervalId = setInterval(() => {
+        if (i === clickedItems.length) {
+          clearInterval(intervalId);
+          setClickedItems([]);
+          setCompleted(false);
+        } else {
+          const index = clickedItems[i];
+     
+          //every we remove the first item in the array 
+          setClickedItems(prevClickedItems => prevClickedItems.filter(itemIndex => itemIndex !== index));
+          
+        }
+      }, 300);
+    }
+    return () => clearInterval(intervalId);
+  }, [clickedItems, completed]);
+
+  // Use setInterval to remove background color from clicked items one by one
+ 
+  function handleClick(index) {
+    if (clickedItems.includes(index)) return
+      setClickedItems([...clickedItems, index]);
+    
+  } 
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="grid">
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => (
+        <div
+          key={index}
+          className={`item ${clickedItems.includes(index) ? 'selected' : ''}`}
+          style={{pointerEvents : completed ? "none" :" "}}
+          onClick={() => handleClick(index)}
+        />
+      ))}
     </div>
   );
 }
+
 
 export default App;
